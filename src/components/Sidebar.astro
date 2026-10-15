@@ -1,0 +1,41 @@
+---
+import SearchBox from './SearchBox.astro';
+import { getPosts, tagCounts, tagSlug } from '../lib/site';
+
+const posts = await getPosts();
+const recent = posts.slice(0, 6);
+const tags = [...tagCounts(posts)].filter(([, n]) => n > 1);
+const max = Math.max(...tags.map(([, n]) => n));
+// WordPress-style tag cloud: 8pt–22pt scaled by usage.
+const size = (n: number) => (8 + ((22 - 8) * (n - 1)) / Math.max(1, max - 1)).toFixed(1);
+---
+
+<aside class="sidebar" aria-label="Sidebar">
+  <section class="widget">
+    <SearchBox />
+  </section>
+  <section class="widget">
+    <h2 class="widget-title">Recent Posts</h2>
+    <ul>
+      {
+        recent.map((p) => (
+          <li>
+            <a href={p.data.permalink}>{p.data.title}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  <section class="widget">
+    <h2 class="widget-title">Tags</h2>
+    <div class="tag-cloud">
+      {
+        tags.map(([tag, n]) => (
+          <a href={`/tag/${tagSlug(tag)}/`} style={`font-size: ${size(n)}pt`} title={`${n} posts`}>
+            {tag}
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</aside>

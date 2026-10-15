@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import Timeline from '../components/Timeline.astro';
+import { getPosts, SITE } from '../lib/site';
+
+const posts = await getPosts();
+const pages = Math.ceil(posts.length / SITE.postsPerPage);
+---
+
+<Base>
+  <Timeline posts={posts.slice(0, SITE.postsPerPage)} nextUrl={pages > 1 ? '/page/2/' : undefined} />
+</Base>

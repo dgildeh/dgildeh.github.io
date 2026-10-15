@@ -1,0 +1,39 @@
+---
+import Ribbon from './Ribbon.astro';
+import { postDate, publicImageSize, type Post } from '../lib/site';
+
+interface Props {
+  post: Post;
+  /** Position in the chronological list; used to restore order on phones. */
+  order: number;
+  eager?: boolean;
+}
+
+const { post, order, eager = false } = Astro.props;
+const { title, permalink, image, description } = post.data;
+const date = postDate(post);
+const size = image ? publicImageSize(image) : undefined;
+---
+
+<article class="post-card" style={`--order: ${order}`}>
+  <a href={permalink} tabindex="-1" aria-hidden="true"><Ribbon /></a>
+  {
+    image && (
+      <a href={permalink} class="image-frame" tabindex="-1" aria-hidden="true">
+        <img
+          src={image}
+          alt=""
+          width={size?.width}
+          height={size?.height}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </a>
+    )
+  }
+  {description && <div class="excerpt"><p>{description}</p></div>}
+  <div class="post-details">
+    <h2><a href={permalink} rel="bookmark">{title}</a></h2>
+    <time datetime={date.iso}>{date.label}</time>
+  </div>
+</article>

@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Search">
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+  <article class="content">
+    <header class="entry-header">
+      <h1 class="entry-title">Search</h1>
+    </header>
+    <div id="search"></div>
+    <noscript><p>Search needs JavaScript enabled.</p></noscript>
+  </article>
+  <script is:inline src="/pagefind/pagefind-ui.js"></script>
+  <script is:inline>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!window.PagefindUI) {
+        document.getElementById('search').textContent =
+          'Search index not found. Run `npm run build` to generate it.';
+        return;
+      }
+      const ui = new PagefindUI({ element: '#search', showSubResults: true, showImages: false });
+      const q = new URLSearchParams(location.search).get('q');
+      if (q) ui.triggerSearch(q);
+    });
+  </script>
+</Base>

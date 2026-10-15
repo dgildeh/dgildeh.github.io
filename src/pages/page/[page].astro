@@ -1,0 +1,30 @@
+---
+// WordPress-style pagination: /page/2/, /page/3/, …
+import Base from '../../layouts/Base.astro';
+import Timeline from '../../components/Timeline.astro';
+import { getPosts, SITE } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const pages = Math.ceil(posts.length / SITE.postsPerPage);
+  return Array.from({ length: pages - 1 }, (_, i) => {
+    const page = i + 2;
+    return {
+      params: { page: String(page) },
+      props: {
+        page,
+        offset: (page - 1) * SITE.postsPerPage,
+        posts: posts.slice((page - 1) * SITE.postsPerPage, page * SITE.postsPerPage),
+        nextUrl: page < pages ? `/page/${page + 1}/` : undefined,
+        prevUrl: page === 2 ? '/' : `/page/${page - 1}/`,
+      },
+    };
+  });
+}
+
+const { page, offset, posts, nextUrl, prevUrl } = Astro.props;
+---
+
+<Base title={`Page ${page}`}>
+  <Timeline posts={posts} offset={offset} nextUrl={nextUrl} prevUrl={prevUrl} />
+</Base>

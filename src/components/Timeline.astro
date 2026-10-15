@@ -1,0 +1,133 @@
+---
+import PostCard from './PostCard.astro';
+import SearchBox from './SearchBox.astro';
+import type { Post } from '../lib/site';
+
+interface Props {
+  posts: Post[];
+  /** Index of the first post in the full list (for paginated pages). */
+  offset?: number;
+  prevUrl?: string;
+  nextUrl?: string;
+}
+
+const { posts, offset = 0, prevUrl, nextUrl } = Astro.props;
+// Avid alternates posts down a centre line: 1st left, 2nd right, 3rd left…
+const indexed = posts.map((post, i) => ({ post, i: offset + i }));
+const left = indexed.filter(({ i }) => i % 2 === 0);
+const right = indexed.filter(({ i }) => i % 2 === 1);
+---
+
+<div class="timeline" data-next={nextUrl}>
+  <div class="timeline-col left">
+    {left.map(({ post, i }) => <PostCard post={post} order={i} eager={i - offset < 2} />)}
+  </div>
+  <div class="timeline-col right">
+    <SearchBox rss />
+    {right.map(({ post, i }) => <PostCard post={post} order={i} eager={i - offset < 2} />)}
+  </div>
+</div>
+
+<div class="infinite-status" aria-live="polite"></div>
+
+{
+  (prevUrl || nextUrl) && (
+    <nav class="pagination" aria-label="Posts">
+      {nextUrl ? <a href={nextUrl}>&larr; Older posts</a> : <span />}
+      {prevUrl ? <a href={prevUrl}>Newer posts &rarr;</a> : <span />}
+    </nav>
+  )
+}
+
+<script>
+  // Lay cards out like Avid's timeline: each post, in date order, goes into
+  // whichever column is currently shorter. Cards then always sit lower than
+  // newer ones, so the oldest post is the last thing on the page. The
+  // server-rendered left/right alternation is the no-JS fallback.
+  //
+  // Infinite scroll, like WordPress.com's: when the reader nears the end of
+  // the timeline, fetch the next /page/N/ and append its posts in place.
+  // Without JS the pagination links above still work.
+  const timeline = document.querySelector<HTMLElement>('.timeline');
+  const status = document.querySelector<HTMLElement>('.infinite-status');
+  const pagination = document.querySelector<HTMLElement>('.pagination');
+
+  if (timeline && status) {
+    const left = timeline.querySelector<HTMLElement>('.timeline-col.left')!;
+    const right = timeline.querySelector<HTMLElement>('.timeline-col.right')!;
+    const order = (card: Element) => Number((card as HTMLElement).style.getPropertyValue('--order'));
+
+    const layout = () => {
+      // Phones show one column (columns use display: contents); nothing to balance.
+      if (getComputedStyle(left).display === 'contents') return;
+      const cards = [...timeline.querySelectorAll('.post-card')].sort((a, b) => order(a) - order(b));
+      cards.forEach((card) => card.remove());
+      for (const card of cards) {
+        (left.offsetHeight <= right.offsetHeight ? left : right).append(card);
+      }
+    };
+
+    layout();
+    document.fonts?.ready.then(layout);
+    let resizeTimer: number | undefined;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(layout, 150);
+    });
+
+    if (timeline.dataset.next && 'IntersectionObserver' in window) {
+      let loading = false;
+      let sentinelVisible = false;
+
+      if (pagination) pagination.hidden = true;
+
+      const loadMore = async () => {
+        const next = timeline.dataset.next;
+        if (!next || loading) return;
+        loading = true;
+        status.textContent = 'Loading older posts…';
+        try {
+          const res = await fetch(next);
+          if (!res.ok) throw new Error(String(res.status));
+          const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+          const nextTimeline = doc.querySelector<HTMLElement>('.timeline');
+          if (!nextTimeline) throw new Error('No posts found');
+          left.append(...nextTimeline.querySelectorAll('.post-card'));
+          layout();
+          if (nextTimeline.dataset.next) {
+            timeline.dataset.next = nextTimeline.dataset.next;
+            status.textContent = '';
+          } else {
+            delete timeline.dataset.next;
+            observer.disconnect();
+            status.textContent = 'You’ve reached the first post.';
+          }
+        } catch {
+          // Fall back to a normal link so readers are never stuck.
+          status.innerHTML = '';
+          const a = document.createElement('a');
+          a.href = next;
+          a.textContent = 'Load older posts';
+          status.append(a);
+          if (pagination) pagination.hidden = false;
+          observer.disconnect();
+        } finally {
+          loading = false;
+        }
+        // The sentinel may still be in view (tall screens); keep filling.
+        requestAnimationFrame(() => {
+          if (timeline.dataset.next && sentinelVisible) loadMore();
+        });
+      };
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          sentinelVisible = entry.isIntersecting;
+          if (sentinelVisible) loadMore();
+        },
+        { rootMargin: '0px 0px 800px 0px' },
+      );
+      observer.observe(status);
+    }
+  }
+</script>

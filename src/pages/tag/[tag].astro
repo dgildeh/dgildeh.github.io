@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import Timeline from '../../components/Timeline.astro';
+import { getPosts, tagCounts, tagSlug } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return [...tagCounts(posts).keys()].map((tag) => ({
+    params: { tag: tagSlug(tag) },
+    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Base title={`Posts tagged “${tag}”`}>
+  <header class="archive-header">
+    <h1>Tag: {tag}</h1>
+  </header>
+  <Timeline posts={posts} />
+</Base>

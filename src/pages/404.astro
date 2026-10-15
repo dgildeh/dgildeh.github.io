@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import SearchBox from '../components/SearchBox.astro';
+---
+
+<Base title="Page not found">
+  <article class="content">
+    <header class="entry-header">
+      <h1 class="entry-title">Page not found</h1>
+    </header>
+    <div class="prose">
+      <p>Sorry, that page doesn’t exist. Try searching, or head back to the <a href="/">home page</a>.</p>
+      <SearchBox />
+    </div>
+  </article>
+</Base>

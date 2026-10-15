@@ -1,0 +1,744 @@
+/*
+ * Recreation of the WordPress.com "Avid" theme (light custom colours) as used
+ * on davidgildeh.com. Decorative images are redrawn in CSS/SVG.
+ */
+@import '@fontsource/rokkitt/400.css';
+@import '@fontsource/rokkitt/700.css';
+@import '@fontsource/varela/400.css';
+
+:root {
+  --text: #6d6d6d;
+  --text-strong: #4f4f4f;
+  --muted: #939393;
+  --link: #6d6d6d;
+  --link-hover: #494949;
+  --content-link: #1e3ea8;
+  --accent: #54775f; /* tagline green */
+  --ribbon: #5f9a82;
+  --cite: #916435;
+  --page-bg: #d3d3d3;
+  --card-bg: #ffffff;
+  --rule: #f2f2f2;
+  --code-bg: #f2f2f2;
+  --footer-bg: #e5e5e5;
+  --shadow: 0 0 3px 3px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 0 3px 3px rgba(0, 0, 0, 0.2);
+  --serif: Rokkitt, Georgia, 'Times New Roman', serif;
+  --label: Varela, Helvetica, Arial, sans-serif;
+  --sans: Helvetica, Arial, Verdana, Tahoma, sans-serif;
+  --mono: Monaco, Menlo, 'Courier New', Courier, monospace;
+  --max: 1140px;
+  /* Diamond lattice texture from the Avid background. */
+  --lattice: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='38' viewBox='0 0 46 38'%3E%3Cpath d='M0 19 23 0l23 19-23 19z' fill='none' stroke='%23ffffff' stroke-opacity='.35' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 13px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--text);
+  line-height: 1.618;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  background: var(--page-bg) var(--lattice) repeat fixed;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+img {
+  height: auto;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+  transition: color 0.1s ease-in-out;
+}
+a:hover,
+a:focus {
+  color: var(--link-hover);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+  color: var(--text);
+  margin: 0 0 0.846rem;
+  overflow-wrap: break-word;
+}
+
+p,
+ul,
+ol,
+dl,
+figure,
+pre,
+table {
+  margin: 0 0 1.692rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.screen-reader-text {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}
+
+/* ---------- Page shell ---------- */
+
+.body-content {
+  border-top: 6px solid #9b9b9b;
+  /* Soft white haze over the header, like Avid's 01.png. */
+  background:
+    radial-gradient(ellipse 60% 220px at 20% 60px, rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(ellipse 45% 200px at 80% 120px, rgba(255, 255, 255, 0.65), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 420px);
+  min-height: 100vh;
+}
+
+.site-header {
+  padding-top: 1.231rem;
+}
+
+.branding {
+  max-width: var(--max);
+  margin: 0 auto 2.308rem;
+  padding: 0 2.5em;
+  text-align: center;
+}
+
+.site-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 2.769rem;
+  line-height: 1.4;
+  margin: 0;
+}
+.site-title a,
+.site-title a:hover {
+  color: var(--text);
+}
+
+.tagline {
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.923rem;
+  color: var(--accent);
+  margin: 0.5rem auto 0;
+  max-width: 900px;
+}
+
+.site-nav {
+  border-top: 1px solid #fff;
+  border-bottom: 1px dashed #fff;
+  text-align: center;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.692rem;
+}
+.site-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 4.5%;
+}
+.site-nav a {
+  display: inline-block;
+  padding: 0.3em 0.5em;
+  color: var(--text);
+  position: relative;
+}
+.site-nav a[aria-current='page']::before {
+  /* Little arrow that marks the current menu item. */
+  content: '';
+  position: absolute;
+  top: -1.25rem;
+  left: 50%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: #fff;
+}
+
+#container {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 2.5em;
+}
+
+/* ---------- Index box (search + RSS) ---------- */
+
+.index-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.search-form {
+  position: relative;
+  flex: 1;
+}
+.search-form input {
+  width: 100%;
+  font: inherit;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.923rem;
+  color: var(--text);
+  background: #ededed;
+  border: 1px solid #e5e5e5;
+  padding: 0.7rem 2.6rem 0.7rem 0.75rem;
+  border-radius: 2px;
+}
+.search-form input::placeholder {
+  color: var(--text);
+  opacity: 1;
+}
+.search-form button {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  padding: 0.25rem;
+  color: #b5b5b5;
+  cursor: pointer;
+  line-height: 0;
+}
+.rss-link {
+  color: #b5b5b5;
+  line-height: 0;
+}
+.rss-link:hover {
+  color: var(--text);
+}
+
+/* ---------- Home page timeline ---------- */
+
+.timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 4.9%;
+  align-items: start;
+}
+/* Centre line between the two columns. */
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 4px;
+  background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6) 90%, rgba(255, 255, 255, 0));
+}
+.timeline-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3.385rem;
+  min-width: 0;
+}
+.timeline-col.right {
+  padding-top: 0;
+}
+.timeline-col.right .index-box {
+  width: 50%;
+  margin-left: auto;
+  margin-bottom: -1.3rem;
+}
+
+.post-card {
+  position: relative;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.1s;
+}
+.post-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+/* Pointer from card to centre line. */
+.post-card::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  border: 10px solid transparent;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.timeline-col.left .post-card::after {
+  left: 100%;
+  border-left-color: #fff;
+}
+.timeline-col.right .post-card::after {
+  right: 100%;
+  border-right-color: #fff;
+}
+.post-card:hover::after {
+  opacity: 1;
+}
+
+.ribbon {
+  position: absolute;
+  top: -2px;
+  left: 8px;
+  z-index: 1;
+  width: 58px;
+  height: 71px;
+  display: block;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+.post-card .image-frame {
+  display: block;
+  margin: 0;
+  line-height: 0;
+  border-bottom: 1px solid #333;
+  overflow: hidden;
+  max-height: 520px;
+}
+.post-card .image-frame img {
+  width: 100%;
+  object-fit: cover;
+}
+.post-card .excerpt {
+  padding: 1.308rem 1.692rem 0.846rem;
+  margin: 0;
+  font-size: 1rem;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.post-card .excerpt p {
+  margin: 0;
+}
+.post-details {
+  border-top: 1px solid var(--rule);
+  padding: 0.923rem;
+  font-size: 0.846rem;
+}
+.post-details h2 {
+  font-family: var(--serif);
+  font-size: 1.231rem;
+  line-height: 1.1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+.post-details h2 a {
+  color: var(--muted);
+}
+.post-details h2 a:hover {
+  color: var(--text-strong);
+}
+
+.infinite-status {
+  min-height: 1px;
+  margin-top: 3.385rem;
+  text-align: center;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.infinite-status:empty {
+  margin-top: 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3.385rem;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.pagination a {
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  padding: 0.75rem 1.25rem;
+}
+
+/* ---------- Single post / page ---------- */
+
+.layout-sidebar {
+  display: grid;
+  grid-template-columns: minmax(0, 69.123%) minmax(0, 1fr);
+  gap: 2.5em;
+  align-items: start;
+}
+
+.content {
+  background: var(--card-bg);
+  border: 1px solid #ccc;
+  box-shadow: var(--shadow);
+  border-radius: 3px;
+  padding: 2.308rem;
+  margin-bottom: 3.385rem;
+}
+
+.entry-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1.692rem;
+  margin-bottom: 1.692rem;
+}
+.entry-title {
+  font-family: var(--serif);
+  font-size: 1.385rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.2;
+  margin: 0 0 0.25rem;
+}
+.entry-meta {
+  color: var(--text-strong);
+  font-size: 1.077rem;
+  line-height: 1.5;
+}
+.entry-meta a {
+  color: var(--content-link);
+}
+
+.prose {
+  font-size: 1.077rem;
+  line-height: 1.618;
+  overflow-wrap: break-word;
+}
+.prose::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.prose p {
+  text-align: justify;
+  hyphens: auto;
+}
+.prose a {
+  color: var(--content-link);
+}
+.prose a:hover {
+  text-decoration: underline;
+}
+.prose h1,
+.prose h2 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.692rem;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  margin-top: 2.2rem;
+  line-height: 1.3;
+}
+.prose h3,
+.prose h6 {
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.923rem;
+  margin-top: 1.692rem;
+}
+.prose h4 {
+  font-weight: bold;
+  font-size: 1.154rem;
+}
+.prose h5 {
+  font-family: var(--serif);
+  font-weight: bold;
+  font-size: 1.385rem;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.5em;
+}
+.prose li > ul,
+.prose li > ol {
+  margin-bottom: 0;
+}
+.prose img {
+  display: block;
+  margin: 0 auto 1.692rem;
+}
+.prose .alignleft {
+  float: left;
+  margin: 0.3rem 1.692rem 1rem 0;
+}
+.prose .alignright {
+  float: right;
+  margin: 0.3rem 0 1rem 1.692rem;
+}
+/* About page "Connect with me" icons: a centred row, as on the old site. */
+.prose .connect-title,
+.prose .connect {
+  text-align: center;
+}
+.prose .connect img {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.prose .caption {
+  text-align: center;
+  font-size: 0.923rem;
+  color: var(--muted);
+  margin-top: -1rem;
+}
+.prose blockquote {
+  position: relative;
+  margin: 0 0 1.692rem;
+  padding-left: 3em;
+  font-size: 1.154rem;
+  color: var(--text);
+  font-family: 'American Typewriter', Georgia, serif;
+}
+.prose blockquote::before {
+  content: '\201C';
+  position: absolute;
+  left: 0.2rem;
+  top: -0.6rem;
+  font-size: 3.846rem;
+  color: #bbb;
+}
+.prose blockquote cite {
+  color: var(--cite);
+}
+.prose code {
+  font-family: var(--mono);
+  font-size: 0.923rem;
+  background: var(--code-bg);
+  border-radius: 3px;
+  padding: 0.077rem 0.231rem;
+}
+.prose pre {
+  font-family: var(--mono);
+  font-size: 0.923rem;
+  line-height: 1.5;
+  padding: 1.25rem;
+  border-radius: 3px;
+  overflow-x: auto;
+  background: var(--code-bg) !important;
+}
+.prose pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+.prose th,
+.prose td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e5e5;
+  vertical-align: top;
+}
+.prose tbody tr:nth-child(even) td {
+  background: var(--code-bg);
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid #e5e5e5;
+  margin: 2rem 0;
+}
+.embed {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 1.692rem;
+  box-shadow: var(--shadow);
+}
+.embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.entry-footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 1.25rem;
+  margin-top: 1.692rem;
+  font-size: 0.923rem;
+}
+.entry-footer .tags a {
+  display: inline-block;
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.846rem;
+  background: var(--code-bg);
+  padding: 0.15rem 0.6rem;
+  margin: 0 0.3rem 0.4rem 0;
+  border-radius: 2px;
+}
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1.692rem;
+  font-size: 0.923rem;
+}
+.post-nav a {
+  max-width: 48%;
+}
+.post-nav .next {
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  font-size: 0.923rem;
+}
+.widget {
+  border-top: 1px solid #fff;
+  padding: 1.5rem 0;
+}
+.widget:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.widget-title {
+  font-family: var(--label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.923rem;
+  margin-bottom: 1rem;
+}
+.widget ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.widget li {
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+.tag-cloud {
+  line-height: 1.6;
+}
+.tag-cloud a {
+  display: inline-block;
+  margin-right: 0.35em;
+}
+
+/* ---------- Archive headers ---------- */
+
+.archive-header {
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.692rem;
+  margin-bottom: 3.385rem;
+}
+.archive-header h1 {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 1.385rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  background: var(--footer-bg) var(--lattice) repeat fixed;
+  color: #7f7f7f;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.923rem;
+}
+.site-footer a {
+  color: #7f7f7f;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .layout-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  #container {
+    padding: 1.5em 16px;
+  }
+  .branding {
+    padding: 0 16px;
+  }
+  .site-nav ul {
+    gap: 0.25rem 1rem;
+    padding: 0.9rem 0.5rem;
+  }
+  .site-nav a[aria-current='page']::before {
+    display: none;
+  }
+  /* One column on phones, back in chronological order. */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .timeline::before {
+    display: none;
+  }
+  .timeline-col {
+    display: contents;
+  }
+  .timeline .post-card {
+    order: var(--order);
+  }
+  .timeline-col.right .index-box {
+    order: -1;
+    width: 100%;
+    margin: 0;
+  }
+  .post-card::after {
+    display: none;
+  }
+  .content {
+    padding: 1.5rem 1.1rem;
+  }
+  .prose p {
+    text-align: left;
+  }
+  .prose .alignleft,
+  .prose .alignright {
+    max-width: 40%;
+  }
+}
