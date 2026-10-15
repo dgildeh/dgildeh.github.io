@@ -57,14 +57,28 @@ const right = indexed.filter(({ i }) => i % 2 === 1);
     const right = timeline.querySelector<HTMLElement>('.timeline-col.right')!;
     const order = (card: Element) => Number((card as HTMLElement).style.getPropertyValue('--order'));
 
-    const layout = () => {
-      // Phones show one column (columns use display: contents); nothing to balance.
-      if (getComputedStyle(left).display === 'contents') return;
-      const cards = [...timeline.querySelectorAll('.post-card')].sort((a, b) => order(a) - order(b));
-      cards.forEach((card) => card.remove());
-      for (const card of cards) {
-        (left.offsetHeight <= right.offsetHeight ? left : right).append(card);
+    // Phones show one column (columns use display: contents); nothing to balance.
+    const singleColumn = () => getComputedStyle(left).display === 'contents';
+
+    /** Add cards below the existing ones, oldest last, each into the shorter column. */
+    const place = (cards: Element[]) => {
+      for (const card of cards.sort((a, b) => order(a) - order(b))) {
+        (singleColumn() || left.offsetHeight <= right.offsetHeight ? left : right).append(card);
       }
+    };
+
+    /** Re-place every card, e.g. after a resize. Keeps the reader's scroll position. */
+    const layout = () => {
+      if (singleColumn()) return;
+      const cards = [...timeline.querySelectorAll('.post-card')];
+      // Hold the page height while the cards are detached; otherwise browsers
+      // without scroll anchoring (Firefox) clamp the scroll position to the top.
+      const y = window.scrollY;
+      timeline.style.minHeight = `${timeline.offsetHeight}px`;
+      cards.forEach((card) => card.remove());
+      place(cards);
+      timeline.style.minHeight = '';
+      if (window.scrollY !== y) window.scrollTo(0, y);
     };
 
     layout();
@@ -92,8 +106,7 @@ const right = indexed.filter(({ i }) => i % 2 === 1);
           const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
           const nextTimeline = doc.querySelector<HTMLElement>('.timeline');
           if (!nextTimeline) throw new Error('No posts found');
-          left.append(...nextTimeline.querySelectorAll('.post-card'));
-          layout();
+          place([...nextTimeline.querySelectorAll('.post-card')]);
           if (nextTimeline.dataset.next) {
             timeline.dataset.next = nextTimeline.dataset.next;
             status.textContent = '';
